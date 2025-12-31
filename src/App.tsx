@@ -6,11 +6,18 @@ function App() {
   const stateOrder = ['home', 'q1', 'q2', 'q3', 'q4', 'q5'];
   type PageState = typeof stateOrder[number];
 
-  const [currentState, setCurrentState] = useState<PageState>('q5');
+  const [currentState, setCurrentState] = useState<PageState>('q1');
   const [inputExpense, setInputExpense] = useState<number>(0);
   const [inputCategory, setInputCategory] = useState<string>("");
-  const nextButton = document.getElementById("next-button");
-  const prevButton = document.getElementById("prev-button");
+  const nextButton = document.getElementById('next-button');
+  const prevButton = document.getElementById('prev-button');
+
+  const handleNext = () =>{
+   const currentIndex = stateOrder.indexOf(currentState);
+   if(currentIndex < stateOrder.length - 1) {
+    setCurrentState(stateOrder[currentIndex + 1]);
+   }
+  };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -40,6 +47,7 @@ function App() {
   //cleanup to prevent multiple listeners
   return () => window.removeEventListener('keydown', handleKeyDown);
   }, [inputExpense, inputCategory, currentState]);
+  
 
   return (
     <>
@@ -92,6 +100,13 @@ function App() {
           </input>
           </div>
       )}
+        <div className="nav-controls">
+        <button 
+          id='next-button'
+          onClick={handleNext} disabled={currentState === 'q5'}>
+            Next
+          </button>
+      </div>
 
       </div>
       </>
