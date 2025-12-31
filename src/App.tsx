@@ -1,22 +1,28 @@
-import { useState } from 'react'
-import { useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
+  //order our questions for navigation 
   const stateOrder = ['home', 'q1', 'q2', 'q3', 'q4', 'q5'];
+  //manage state for 
   type PageState = typeof stateOrder[number];
 
   const [currentState, setCurrentState] = useState<PageState>('q1');
   const [inputExpense, setInputExpense] = useState<number>(0);
   const [inputCategory, setInputCategory] = useState<string>("");
-  const nextButton = document.getElementById('next-button');
-  const prevButton = document.getElementById('prev-button');
 
   const handleNext = () =>{
    const currentIndex = stateOrder.indexOf(currentState);
    if(currentIndex < stateOrder.length - 1) {
     setCurrentState(stateOrder[currentIndex + 1]);
    }
+  };
+
+  const handlePrev = () => {
+    const currentIndex = stateOrder.indexOf(currentState);
+    if(currentIndex > 0){
+      setCurrentState(stateOrder[currentIndex - 1]);
+    }
   };
 
   useEffect(() => {
@@ -103,8 +109,17 @@ function App() {
         <div className="nav-controls">
         <button 
           id='next-button'
-          onClick={handleNext} disabled={currentState === 'q5'}>
+          onClick={handleNext} 
+          disabled={currentState === 'q5'} 
+          hidden={currentState === 'q5'}>
             Next
+          </button>
+          <button 
+          id='prev-button'
+          onClick={handlePrev} 
+          disabled={currentState === 'home'} 
+          hidden={currentState === 'home'}>
+            Back
           </button>
       </div>
 
