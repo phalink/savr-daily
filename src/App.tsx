@@ -3,15 +3,15 @@ import './App.css'
 
 function App() {
   //order our questions for navigation and for managing state
-  const stateOrder = ['home', 'q1', 'q2', 'q3', 'q4', 'q5'];
+  const stateOrder = ['home', 'q1', 'q2', 'q3', 'q4', 'q5', 'summary'];
   type PageState = typeof stateOrder[number];
 
-  const [currentState, setCurrentState] = useState<PageState>('q1');
+  const [currentState, setCurrentState] = useState<PageState>('q4');
   const [inputExpense, setInputExpense] = useState<number>(0);
   const [inputCategory, setInputCategory] = useState<string>("");
+  const currentIndex = stateOrder.indexOf(currentState);
 
-  const handleNext = () =>{
-   const currentIndex = stateOrder.indexOf(currentState);
+  const handleNext = (incrementBy: number) =>{
    if(currentIndex < stateOrder.length - 1) {
     //store input value when moving to next question
     if(currentState === 'q1'){
@@ -27,6 +27,17 @@ function App() {
       handleSetStoredValue('q4', inputExpense);
       setInputCategory("");
    }
+    else if(currentState === 'q5'){
+      let count = incrementBy;
+      //pull existing count from storage
+      handleGetStoredValue(`${count}`);
+      handleSetStoredValue('q5', inputExpense);
+      handleSetStoredCategory('q5', inputCategory);
+      setInputCategory("");
+      count += 1;
+      handleSetStoredValue(`${count}`, count);
+      console.log("Submit count: ", count);
+    }
     setCurrentState(stateOrder[currentIndex + 1]);
     setInputExpense(handleGetStoredValue(stateOrder[currentIndex + 1]));
   }
@@ -36,6 +47,16 @@ function App() {
     localStorage.setItem(key, value.toString());
   }
 
+  const handleSetStoredCategory = (key: string, value: string) => {
+    localStorage.setItem(key, value);
+  }
+
+  const handleGetStoredCategory = (key: string): string => {
+    const storedCategory = localStorage.getItem(key);
+    if(!storedCategory) return "";
+    return storedCategory ? storedCategory : "";
+  }
+
   const handleGetStoredValue = (key: string): number => {
     const storedValue = localStorage.getItem(key);
     if(!storedValue) return 0;
@@ -43,7 +64,6 @@ function App() {
   }
 
   const handlePrev = () => {
-    const currentIndex = stateOrder.indexOf(currentState);
     if(currentIndex > 0){
       //if going back to income question, prefill with stored value
       if(currentState === 'q1'){
@@ -61,11 +81,14 @@ function App() {
       else if(currentState === 'q5'){
         setInputExpense(handleGetStoredValue('q4'));
       }
+      else if(currentState === 'summary'){
+        setInputExpense(handleGetStoredValue('q5'));
+        setInputCategory(handleGetStoredCategory('q5'));
+      }
       setCurrentState(stateOrder[currentIndex - 1]);
     }
   };
 
-  
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Enter' && currentState === 'q1') {
@@ -90,12 +113,17 @@ function App() {
         setInputExpense(handleGetStoredValue('q5'));
       }
       else if (event.key === 'Enter' && currentState === 'q5') {
-        //process input before clearing
-        console.log(`Submit input for ${currentState}:`, inputExpense);
-        handleSetStoredValue('q5', inputExpense);
-        setInputCategory("");
-        setCurrentState('q5');
-        setInputExpense(handleGetStoredValue('q5'));
+        if (inputExpense === 0 && inputCategory === '') {
+          //process input before clearing
+          console.log(`Submit input for ${currentState}:`, inputExpense);
+          handleSetStoredValue('q5', inputExpense);
+          setInputCategory("");
+          setCurrentState('summary');
+          setInputExpense(handleGetStoredValue('summary'));
+        } else {
+          console.log('test failed');
+        }
+
       }
     };
 
@@ -185,9 +213,9 @@ function App() {
         <div className="nav-controls">
         <button 
           id='next-button'
-          onClick={handleNext} 
-          disabled={currentState === 'q5'} 
-          hidden={currentState === 'q5'}>
+          onClick={handleNext(1)} 
+          disabled={currentState === 'summary'} 
+          hidden={currentState === 'summary'}>
             Next
           </button>
           <button 
@@ -199,6 +227,12 @@ function App() {
           </button>
       </div>
 
+      {(currentState === 'q2' || currentState === 'q3' || currentState === 'q4' || currentState === 'q5') &&( 
+      <div className="confirmation-box">
+        <h3>Nice, you added: </h3>
+        <p>{handleGetStoredValue(stateOrder[currentIndex - 1])}</p>
+      </div>
+      )}
       </div>
       </>
   );
