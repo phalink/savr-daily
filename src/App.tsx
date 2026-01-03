@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import {handleSetStoredValue, handleGetStoredValue, handleSetStoredCategory, handleGetStoredCategory } from './storageHandles';
 
 function App() {
   //order our questions for navigation and for managing state
@@ -11,7 +12,7 @@ function App() {
   const [inputCategory, setInputCategory] = useState<string>("");
   const currentIndex = stateOrder.indexOf(currentState);
 
-  const handleNext = (incrementBy: number) =>{
+  const handleNext = () =>{
    if(currentIndex < stateOrder.length - 1) {
     //store input value when moving to next question
     if(currentState === 'q1'){
@@ -28,40 +29,21 @@ function App() {
       setInputCategory("");
    }
     else if(currentState === 'q5'){
-      let count = incrementBy;
       //pull existing count from storage
-      handleGetStoredValue(`${count}`);
+      //handleGetStoredValue(`${count}`);
       handleSetStoredValue('q5', inputExpense);
       handleSetStoredCategory('q5', inputCategory);
       setInputCategory("");
-      count += 1;
-      handleSetStoredValue(`${count}`, count);
-      console.log("Submit count: ", count);
+      //count += 1;
+      //handleSetStoredValue(`${count}`, count);
+      //console.log("Submit count: ", count);
     }
     setCurrentState(stateOrder[currentIndex + 1]);
     setInputExpense(handleGetStoredValue(stateOrder[currentIndex + 1]));
   }
   };
 
-  const handleSetStoredValue = (key: string, value: number) => {
-    localStorage.setItem(key, value.toString());
-  }
-
-  const handleSetStoredCategory = (key: string, value: string) => {
-    localStorage.setItem(key, value);
-  }
-
-  const handleGetStoredCategory = (key: string): string => {
-    const storedCategory = localStorage.getItem(key);
-    if(!storedCategory) return "";
-    return storedCategory ? storedCategory : "";
-  }
-
-  const handleGetStoredValue = (key: string): number => {
-    const storedValue = localStorage.getItem(key);
-    if(!storedValue) return 0;
-    return storedValue ? Number(storedValue) : 0;
-  }
+  
 
   const handlePrev = () => {
     if(currentIndex > 0){
@@ -213,7 +195,7 @@ function App() {
         <div className="nav-controls">
         <button 
           id='next-button'
-          onClick={handleNext(1)} 
+          onClick={handleNext} 
           disabled={currentState === 'summary'} 
           hidden={currentState === 'summary'}>
             Next
