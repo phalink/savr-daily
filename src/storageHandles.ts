@@ -14,6 +14,6 @@
 
   export const handleGetStoredValue = (key: string): number => {
     const storedValue = localStorage.getItem(key);
-    if(!storedValue) return 0;
+    //if(!storedValue) return 0;
     return storedValue ? Number(storedValue) : 0;
   }
