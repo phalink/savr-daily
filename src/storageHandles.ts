@@ -18,7 +18,9 @@
     return storedValue ? Number(storedValue) : 0;
   }
 
-  //todo include all values AND categories
+
+
+  /*
   export const handleGetAllCountValues = (count: number): string => {
     let valuesList = "";
 
@@ -32,4 +34,4 @@
       }
     }
     return valuesList;
-  }
+  }*/

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import {handleSetStoredValue, handleGetStoredValue, handleSetStoredCategory, handleGetStoredCategory, handleGetAllCountValues } from './storageHandles';
+import {handleSetStoredValue, handleGetStoredValue, handleSetStoredCategory, handleGetStoredCategory } from './storageHandles';
 
 function App() {
   //order our questions for navigation and for managing state
@@ -36,22 +36,15 @@ function App() {
       console.log("Submit count: ", count);
    }
     else if(currentState === 'q5'){
-      //TODO
-      //while loop to allow multiple other expenses to be added
-      //let count = 1;
       //store input value
-      console.log("Submitting q5 input");
-      console.log(`Submit input for ${currentState}:`, inputExpense, inputCategory);
       //pull existing count from storage
       //handleGetStoredValue(`${count}`);
       //handleSetStoredValue('q5', inputExpense);
-      //handleSetStoredCategory('q5', inputCategory);
-      setInputCategory("");
       setCount(count => count + 1);
+      handleSetStoredCategory(`expenseCategory${count}`, inputCategory);
+      setInputCategory("");
       handleSetStoredValue(`expenseAmount${count}`, inputExpense);
-      console.log("Stored expenseAmount"+count+": ", handleGetStoredValue(`expenseAmount${count}`));
       //handleSetStoredValue(`${count}`, count);
-      console.log("Submit count: ", count);
     }
     setCurrentState(stateOrder[currentIndex + 1]);
     setInputExpense(handleGetStoredValue(stateOrder[currentIndex + 1]));
@@ -82,6 +75,32 @@ function App() {
       }
       setCurrentState(stateOrder[currentIndex - 1]);
     }
+  };
+
+  const handleSubmitExpense = () => {
+    setCount(count + 1);
+    handleSetStoredCategory(`expenseCategory${count}`, inputCategory);
+    setInputCategory("");
+    handleSetStoredValue(`expenseAmount${count}`, inputExpense);
+    setInputExpense(handleGetStoredValue(stateOrder[currentIndex]));
+  }
+    //todo include all values AND categories
+  const handleGetAllCountValuesCategories = (count: number): string => {
+    let valuesList = "";
+    for (let i = 1; i <= count; i++) {
+      const valueKey = `expenseAmount${i}`;
+      const categoryKey = `expenseCategory${i}`;
+      const value = localStorage.getItem(valueKey);
+      const category = localStorage.getItem(categoryKey);
+      if (value) {
+        valuesList += `Expense ${i}: ${value}`;
+        if (category) {
+          valuesList += ` (${category})`;
+        }
+        valuesList += "\n";
+      }
+    }
+    return valuesList;
   };
 
   useEffect(() => {
@@ -224,29 +243,20 @@ function App() {
 
       {currentState === 'q5' && (
       <div className="confirmation-box">
-        <h3>Nice, your extra expenses so far: </h3>
-        <p>{count}: {inputCategory}: {inputExpense}</p>
-        <button onClick={() => setCount(count => count + 1)}>
+        <button onClick={handleSubmitExpense }>
             Add Another Expense
         </button>
-        
+        <h3>Nice, your extra expenses so far: </h3>
+        <p>{handleGetAllCountValuesCategories(count)}</p>
       </div>
       
       )}
 
-      {(currentState === 'q2' || currentState === 'q3' || currentState === 'q4' || currentState === 'q5') &&( 
+      {(currentState === 'q2' || currentState === 'q3' || currentState === 'q4' ) &&( 
       <div className="confirmation-box">
         <h3>Nice, your previous submission: </h3>
         <p>{handleGetStoredValue(stateOrder[currentIndex - 1])}</p>
       </div>
-      )}
-
-      {currentState === 'q5' && (
-        <div className="delete-box">
-          <h3>List of expenses:</h3>
-          <p>{handleGetAllCountValues(count)}</p>
-          </div>
-        
       )}
       </div>
       </>
