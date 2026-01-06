@@ -18,20 +18,11 @@
     return storedValue ? Number(storedValue) : 0;
   }
 
+  export const handleRemoveStoredValue = (key: string) => {
+    
+    localStorage.removeItem(key);
+  }
 
-
-  /*
-  export const handleGetAllCountValues = (count: number): string => {
-    let valuesList = "";
-
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('expenseAmount')) {
-        const value = localStorage.getItem(key);
-        if (value) {
-          valuesList += `${value}, `;
-        }
-      }
-    }
-    return valuesList;
-  }*/
+  export const handleRemoveStoredCategory = (key: string) => {
+    localStorage.removeItem(key);
+  }

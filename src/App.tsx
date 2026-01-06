@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import {handleSetStoredValue, handleGetStoredValue, handleSetStoredCategory, handleGetStoredCategory } from './storageHandles';
+import {handleSetStoredValue, handleGetStoredValue, handleSetStoredCategory, handleGetStoredCategory, handleRemoveStoredValue } from './storageHandles';
 
 function App() {
   //order our questions for navigation and for managing state
@@ -9,6 +9,7 @@ function App() {
   const [count, setCount] = useState(0);
 
   const [currentState, setCurrentState] = useState<PageState>('q4');
+  //todo: refactor to array of objects for expenses and categories
   const [inputExpense, setInputExpense] = useState<number>(0);
   const [inputCategory, setInputCategory] = useState<string>("");
   const currentIndex = stateOrder.indexOf(currentState);
@@ -81,6 +82,7 @@ function App() {
     setCount(count + 1);
     handleSetStoredCategory(`expenseCategory${count}`, inputCategory);
     setInputCategory("");
+    <div><p>'testing'</p></div>
     handleSetStoredValue(`expenseAmount${count}`, inputExpense);
     setInputExpense(handleGetStoredValue(stateOrder[currentIndex]));
   }
@@ -137,7 +139,6 @@ function App() {
         } else {
           console.log('test failed');
         }
-
       }
     };
 
@@ -248,8 +249,8 @@ function App() {
         </button>
         <h3>Nice, your extra expenses so far: </h3>
         <p>{handleGetAllCountValuesCategories(count)}</p>
+        <button onClick={handleRemoveStoredValue(`expenseAmount${count - 1}`)}>Remove Last Expense</button>
       </div>
-      
       )}
 
       {(currentState === 'q2' || currentState === 'q3' || currentState === 'q4' ) &&( 
