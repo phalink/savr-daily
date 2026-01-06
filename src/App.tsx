@@ -8,7 +8,7 @@ function App() {
   type PageState = typeof stateOrder[number];
   const [count, setCount] = useState(0);
 
-  const [currentState, setCurrentState] = useState<PageState>('q4');
+  const [currentState, setCurrentState] = useState<PageState>('q5');
   //todo: refactor to array of objects for expenses and categories
   const [inputExpense, setInputExpense] = useState<number>(0);
   const [inputCategory, setInputCategory] = useState<string>("");
@@ -216,8 +216,11 @@ function App() {
       
       {currentState === 'q5' && (
         <div className="page">
-          <h2>Almost done! Enter any other expenses:</h2>
+          <h2>Almost done!</h2> 
+          <h3>Enter any other expenses:</h3>
+          <p id='amount-title'>amount:
           <input 
+            //id='expense-input'
             value={inputExpense}
             onChange={(e) => {
               const val = e.target.value;
@@ -225,13 +228,16 @@ function App() {
             }}
             >
           </input>
-          <h3>category:</h3>
+          </p>
+          <p>category:
           <input 
+            id='category-input'
             placeholder='dining out, utilities, etc.'
             value={inputCategory}
             onChange={(e) => setInputCategory(e.target.value)}
             >
           </input>
+          </p>
           </div>
       )}
         <div className="nav-controls">
