@@ -241,7 +241,7 @@ function App() {
           </div>
       )}
     
-
+/
       {currentState === 'q5' && (
       <div className="confirmation-box">
         <button onClick={handleSubmitExpense }>
