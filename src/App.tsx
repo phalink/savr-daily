@@ -13,7 +13,7 @@ function App() {
   const [inputExpense, setInputExpense] = useState<number>(0);
   const [inputCategory, setInputCategory] = useState<string>("");
   const currentIndex = stateOrder.indexOf(currentState);
-  const [inputExpenseArray, setInputExpenseArray] = useState<number[]>([]);
+  const [inputExpenseArray, setInputExpenseArray] = useState<{amount: number, category: string}[]>([]);
 
   const handleNext = () =>{
    if(currentIndex < stateOrder.length - 1) {
@@ -95,11 +95,8 @@ function App() {
       setInputCategory("");
       handleSetStoredValue(`expenseAmount${count}`, inputExpense);
       setInputExpense(handleGetStoredValue(stateOrder[currentIndex]));
-  }
-
-  const handleRemoveExpense = (key: string) => {
-    handleRemoveStoredValue(key);
-  }
+      
+    }
 
   const handleClearAllStorage = () => {
     localStorage.clear();
@@ -110,67 +107,25 @@ function App() {
   };
 
   const renderExpenses = () => {
-    setInputExpenseArray([]);
     const expenses = [];
-    const expenseCount = localStorage.length / 2; //each expense has a category, so divide by 2
-    for (let i = 0; i < expenseCount; i++) {
+    for(let i = 0; i < count; i++){
       const amount = handleGetStoredValue(`expenseAmount${i}`);
       const category = handleGetStoredCategory(`expenseCategory${i}`);
       expenses.push(
         <div key={i}>
           <p>Expense {i + 1}: ${amount} - {category}</p>
-          <button onClick={() => renderEditExpense}>Edit</button>
+          <button onClick={() => editLocalStorageExpense(`expenseAmount${i}`, `expenseCategory${i}`, amount, category)}>Edit</button>
         </div>
       );
-      setInputExpenseArray(prev => [...prev, amount]);
     }
-   
-  }
+    return expenses;
+  };
 
   //todo implement edit expense function
-  const renderEditExpense = () => {
-    return (
-      <div>
-        <h2>Edit Expense</h2>
-        <p>Amount: 
-          <input
-            value={inputExpense}
-            onChange={(e) => {
-              const val = e.target.value;
-              setInputExpense(val === "" ? 0 : Number(val));
-            }}
-          />
-        </p>
-        <p>Category: 
-          <input
-            value={inputCategory}
-            onChange={(e) => setInputCategory(e.target.value)}
-          />
-        </p>
-      </div>
-    );
-  };
-
-
-  /*
-  const handleGetAllValuesCategories = (): string => {
-    let valuesList = "";
-    for (let i = 0; i <= localStorage.length; i++) {
-      const valueKey = `expenseAmount${i}`;
-      const categoryKey = `expenseCategory${i}`;
-      const value = localStorage.getItem(valueKey);
-      const category = localStorage.getItem(categoryKey);
-      if (value) {
-        valuesList += `Expense ${i}: ${value}`;
-        if (category) {
-          valuesList += ` ${category}`;
-        }
-        valuesList += "\n";
-      }
-    }
-    return valuesList;
-  };
-*/
+  const editLocalStorageExpense = (keyAmount: string, keyCategory: string, newAmount: number, newCategory: string) => {
+    handleSetStoredValue(keyAmount, newAmount);
+    handleSetStoredCategory(keyCategory, newCategory);
+  }
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -304,7 +259,7 @@ function App() {
         <button onClick={handleSubmitExpense }>
             Add Another Expense
         </button>
-        {renderExpenses()}
+        <button onClick={() => renderExpenses()}>View Expenses</button>
         <button onClick={() => handleRemoveStoredValue(`expenseAmount${count}`)}>Remove Last Expense</button>
         <button onClick={() => handleClearAllStorage()}>Clear All Expenses</button>
       </div>
