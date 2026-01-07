@@ -13,6 +13,7 @@ function App() {
   const [inputExpense, setInputExpense] = useState<number>(0);
   const [inputCategory, setInputCategory] = useState<string>("");
   const currentIndex = stateOrder.indexOf(currentState);
+  const [inputExpenseArray, setInputExpenseArray] = useState<number[]>([]);
 
   const handleNext = () =>{
    if(currentIndex < stateOrder.length - 1) {
@@ -84,15 +85,20 @@ function App() {
     }
     if(localStorage.getItem(`expenseAmount${count}`) !== null){
       setCount((localStorage.length / 2) + 1); //each expense has a category, so divide by 2
+      console.log("Existing expense found, updating count to: ", count);
     }
     else{
-      setCount(count + 1);
-    }
+      setCount(count =>count + 1);
       console.log("Updated count to: ", count);
+    }
       handleSetStoredCategory(`expenseCategory${count}`, inputCategory);
       setInputCategory("");
       handleSetStoredValue(`expenseAmount${count}`, inputExpense);
       setInputExpense(handleGetStoredValue(stateOrder[currentIndex]));
+  }
+
+  const handleRemoveExpense = (key: string) => {
+    handleRemoveStoredValue(key);
   }
 
   const handleClearAllStorage = () => {
@@ -103,7 +109,50 @@ function App() {
     setCurrentState(prev => prev = 'q5');
   };
 
-    //todo include all values AND categories
+  const renderExpenses = () => {
+    setInputExpenseArray([]);
+    const expenses = [];
+    const expenseCount = localStorage.length / 2; //each expense has a category, so divide by 2
+    for (let i = 0; i < expenseCount; i++) {
+      const amount = handleGetStoredValue(`expenseAmount${i}`);
+      const category = handleGetStoredCategory(`expenseCategory${i}`);
+      expenses.push(
+        <div key={i}>
+          <p>Expense {i + 1}: ${amount} - {category}</p>
+          <button onClick={() => renderEditExpense}>Edit</button>
+        </div>
+      );
+      setInputExpenseArray(prev => [...prev, amount]);
+    }
+   
+  }
+
+  //todo implement edit expense function
+  const renderEditExpense = () => {
+    return (
+      <div>
+        <h2>Edit Expense</h2>
+        <p>Amount: 
+          <input
+            value={inputExpense}
+            onChange={(e) => {
+              const val = e.target.value;
+              setInputExpense(val === "" ? 0 : Number(val));
+            }}
+          />
+        </p>
+        <p>Category: 
+          <input
+            value={inputCategory}
+            onChange={(e) => setInputCategory(e.target.value)}
+          />
+        </p>
+      </div>
+    );
+  };
+
+
+  /*
   const handleGetAllValuesCategories = (): string => {
     let valuesList = "";
     for (let i = 0; i <= localStorage.length; i++) {
@@ -114,13 +163,14 @@ function App() {
       if (value) {
         valuesList += `Expense ${i}: ${value}`;
         if (category) {
-          valuesList += ` (${category})`;
+          valuesList += ` ${category}`;
         }
         valuesList += "\n";
       }
     }
     return valuesList;
   };
+*/
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -254,7 +304,7 @@ function App() {
         <button onClick={handleSubmitExpense }>
             Add Another Expense
         </button>
-        <p>{handleGetAllValuesCategories()}</p>
+        {renderExpenses()}
         <button onClick={() => handleRemoveStoredValue(`expenseAmount${count}`)}>Remove Last Expense</button>
         <button onClick={() => handleClearAllStorage()}>Clear All Expenses</button>
       </div>
