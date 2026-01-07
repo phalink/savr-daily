@@ -79,12 +79,20 @@ function App() {
   };
 
   const handleSubmitExpense = () => {
-    setCount(localStorage.length + 1);
-    handleSetStoredCategory(`expenseCategory${count}`, inputCategory);
-    setInputCategory("");
-    <div><p>'testing'</p></div>
-    handleSetStoredValue(`expenseAmount${count}`, inputExpense);
-    setInputExpense(handleGetStoredValue(stateOrder[currentIndex]));
+    if(localStorage.getItem(`expenseAmount${count}`) === null && inputExpense === 0 && inputCategory === ""){
+      return; //do not submit empty expense
+    }
+    if(localStorage.getItem(`expenseAmount${count}`) !== null){
+      setCount((localStorage.length / 2) + 1); //each expense has a category, so divide by 2
+    }
+    else{
+      setCount(count + 1);
+    }
+      console.log("Updated count to: ", count);
+      handleSetStoredCategory(`expenseCategory${count}`, inputCategory);
+      setInputCategory("");
+      handleSetStoredValue(`expenseAmount${count}`, inputExpense);
+      setInputExpense(handleGetStoredValue(stateOrder[currentIndex]));
   }
 
   const handleClearAllStorage = () => {
@@ -241,7 +249,6 @@ function App() {
           </div>
       )}
     
-/
       {currentState === 'q5' && (
       <div className="confirmation-box">
         <button onClick={handleSubmitExpense }>
