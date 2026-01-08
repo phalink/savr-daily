@@ -1,6 +1,6 @@
 import { useState, useEffect, type JSX } from 'react'
 import './App.css'
-import {handleSetStoredValue, handleGetStoredValue, handleSetStoredCategory, handleGetStoredCategory, handleRemoveStoredValue, handleRemoveStoredCategory} from './storageHandles';
+import {handleSetStoredValue, handleGetStoredValue, handleSetStoredCategory, handleGetStoredCategory}  from './storageHandles';
 
 function App() {
   //order our questions for navigation and for managing state
@@ -206,7 +206,7 @@ function App() {
         <div className="page">
           <h2>Almost done!</h2> 
           <h3 id="other-expenses">Enter any other expenses:</h3>
-          <p id='amount-title'>amount:
+          <p id='amount-title'>Amount: 
           <input 
             //id='expense-input'
             value={inputExpense}
@@ -217,10 +217,10 @@ function App() {
             >
           </input>
           </p>
-          <p>category:
+          <p>Category: 
           <input 
             id='category-input'
-            placeholder='dining out, utilities, etc.'
+            placeholder='Dining out, utilities, etc.'
             value={inputCategory}
             onChange={(e) => setInputCategory(e.target.value)}
             >
@@ -234,12 +234,10 @@ function App() {
         <button onClick={handleSubmitExpense }>
             Add Another Expense
         </button>
-        <button onClick={() => handleRemoveStoredValue(`expenseAmount${count}`)}>Remove Last Expense</button>
-        <button onClick={() => handleClearAllStorage()}>Clear All Expenses</button>
 
         <h3>Current Expenses:</h3>
         <div className="display-list">
-      {expenseList.map((item) => (
+        {expenseList.map((item) => (
         <div key={item.id} className="expense-item">
           <strong>{item.category}:</strong> ${item.amount}
         </div>
@@ -247,6 +245,7 @@ function App() {
     </div>
       </div>
       )}
+      <button onClick={() => handleClearAllStorage()}>Clear All Expenses</button>
 
       {(currentState === 'q2' || currentState === 'q3' || currentState === 'q4' ) &&( 
       <div className="confirmation-box">
