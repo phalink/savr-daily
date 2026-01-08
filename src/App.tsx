@@ -1,4 +1,5 @@
 import { useState, useEffect, type JSX } from 'react'
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css'
 import {handleSetStoredValue, handleGetStoredValue, handleSetStoredCategory, handleGetStoredCategory}  from './storageHandles';
 
@@ -14,6 +15,8 @@ function App() {
   const [inputCategory, setInputCategory] = useState<string>("");
   const currentIndex = stateOrder.indexOf(currentState);
   const [expenseList, setExpenseList] = useState<Expense[]>([]);
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
   const handleNext = () =>{
    if(currentIndex < stateOrder.length - 1) {
@@ -103,6 +106,19 @@ function App() {
   
   };
 
+  // Helper function to group your expenseList by category
+const chartData = expenseList.reduce((acc, current) => {
+  const existing = acc.find(item => item.name === current.category);
+  if (existing) {
+    existing.value += Number(current.amount);
+  } else {
+    acc.push({ name: current.category, value: Number(current.amount) });
+  }
+  return acc;
+}, [] as { name: string, value: number }[]);
+
+
+  //todo test keyboard input handling for enter key to submit and move to next question
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Enter' && currentState === 'q1') {
@@ -231,6 +247,31 @@ function App() {
       )}
     
       {currentState === 'q5' && (
+
+        <div style={{ width: '100%', height: 400 }}>
+    <ResponsiveContainer>
+      <PieChart>
+        <Pie
+          data={chartData}
+          cx="50%" // Center X
+          cy="50%" // Center Y
+          labelLine={false}
+          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+          outerRadius={80}
+          fill="#8884d8"
+          dataKey="value" // Links to the 'amount'
+        >
+          {chartData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+      )}
+
       <div className="confirmation-box">
         <button onClick={handleSubmitExpense }>
             Add Another Expense
@@ -249,7 +290,6 @@ function App() {
       ))}
     </div>
       </div>
-      )}
       <button onClick={() => handleClearAllStorage()}>Clear All Expenses</button>
 
       {(currentState === 'q2' || currentState === 'q3' || currentState === 'q4' ) &&( 
