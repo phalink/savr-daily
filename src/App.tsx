@@ -23,22 +23,22 @@ function App() {
     //store input value when moving to next question
     if(currentState === 'q1'){
       handleSetStoredValue('q1', inputExpense);
+      handleSetStoredCategory('q1', 'Income');
     }
     else if(currentState === 'q2'){
       handleSetStoredValue('q2', inputExpense);
+      handleSetStoredCategory('q2', 'Mortgage/Rent');
     }
     else if(currentState === 'q3'){
       handleSetStoredValue('q3', inputExpense);
+      handleSetStoredCategory('q3', 'Entertainment');
     }
     else if(currentState === 'q4'){
       handleSetStoredValue('q4', inputExpense);
       handleSetStoredValue('q5', 0); //reset q5 value for new input
-      console.log('handlegetstoredvalue q5:', handleGetStoredValue('q5'));
+      handleSetStoredCategory('q5', "Car Payment");
       setInputCategory("");
-      console.log("Submitting q4 input");
-      console.log(`Submit input for ${currentState}:`, inputExpense);
       setInputExpense(0);
-      console.log("Submit count: ", count);
    }
     else if(currentState === 'q5'){
       setCount(count => count + 1);
@@ -56,7 +56,6 @@ function App() {
     if(currentIndex > 0){
       //if going back to income question, prefill with stored value
       if(currentState === 'q1'){
-        console.log("At beginning, no previous question");
       }
       else if(currentState === 'q2'){
         setInputExpense(handleGetStoredValue('q1'));
@@ -246,14 +245,11 @@ const chartData = expenseList.reduce((acc, current) => {
             >
           </input>
           </p>
-          </div>
-      )}
-
-      <div className="confirmation-box">
-        <button onClick={handleSubmitExpense }>
+           <button onClick={handleSubmitExpense }>
             Add Expense
         </button>
 
+<div style = {{width: '100%', justifyContent: 'flex-end', marginTop: '1rem'}}>
         <h3>Current Expenses:</h3>
         <div className="display-list">
         {expenseList.map((item) => (
@@ -265,10 +261,13 @@ const chartData = expenseList.reduce((acc, current) => {
           >Remove</button>
         </div>
       ))}
-    </div>
       <button onClick={() => handleClearAllStorage()}>Clear All Expenses</button>
       </div>
+        </div>
+      </div>
+      )}
 
+       
     
       {currentState === 'q5' && (
 
@@ -296,9 +295,8 @@ const chartData = expenseList.reduce((acc, current) => {
   </div>
       )}
       </div>
-</div>
+      </div>
       
-
           <div className="nav-controls">
         
           <button 
