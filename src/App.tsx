@@ -249,7 +249,11 @@ const chartData = expenseList.reduce((acc, current) => {
             Add Expense
         </button>
 
-<div style = {{width: '100%', justifyContent: 'flex-end', marginTop: '1rem'}}>
+<div>
+  <h1>test  </h1>
+  </div>
+
+t<div style = {{width: '100%', justifyContent: 'flex-end', marginTop: '1rem'}}>
         <h3>Current Expenses:</h3>
         <div className="display-list">
         {expenseList.map((item) => (
