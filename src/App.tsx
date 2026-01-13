@@ -9,7 +9,7 @@ function App() {
   type PageState = typeof stateOrder[number];
   const [count, setCount] = useState(0);
 
-  const [currentState, setCurrentState] = useState<PageState>('q5');
+  const [currentState, setCurrentState] = useState<PageState>('q1');
   //todo: refactor to array of objects for expenses and categories
   const [inputExpense, setInputExpense] = useState<number>(0);
   const [inputCategory, setInputCategory] = useState<string>("");
@@ -23,33 +23,78 @@ function App() {
     //store input value when moving to next question
     if(currentState === 'q1'){
       handleSetStoredValue('q1', inputExpense);
-      handleSetStoredCategory('q1', 'Income');
+      //prefill expenselist with income entry
+      if(expenseList.length === 0){
+        setExpenseList((prev) => [...prev, {id: 'income', amount: inputExpense, category: 'Income'}]);
+      }
+      else{
+        setExpenseList((prev) => prev.map(item => item.id === 'income' ? {...item, amount: inputExpense} : item));
+      }
+      console.log(`Stored q1: ${handleGetStoredCategory('q1')}` );
+
     }
     else if(currentState === 'q2'){
       handleSetStoredValue('q2', inputExpense);
-      handleSetStoredCategory('q2', 'Mortgage/Rent');
+      setExpenseList((prev) => [...prev, {id: 'rent', amount: inputExpense, category: 'Mortgage/Rent'}]);
     }
     else if(currentState === 'q3'){
       handleSetStoredValue('q3', inputExpense);
-      handleSetStoredCategory('q3', 'Entertainment');
+      setExpenseList((prev) => [...prev, {id: 'entertainment', amount: inputExpense, category: 'Entertainment'}]);
     }
     else if(currentState === 'q4'){
       handleSetStoredValue('q4', inputExpense);
       handleSetStoredValue('q5', 0); //reset q5 value for new input
-      handleSetStoredCategory('q5', "Car Payment");
-      setInputCategory("");
+      setExpenseList((prev) => [...prev, {id: 'car', amount: inputExpense, category: 'Car Payment'}]);
       setInputExpense(0);
    }
     else if(currentState === 'q5'){
+      //not used currently, since we handle adding expenses with separate button
+      /*
       setCount(count => count + 1);
       handleSetStoredCategory(`expenseCategory${count}`, inputCategory);
       setInputCategory("");
       handleSetStoredValue(`expenseAmount${count}`, inputExpense);
+      */
     }
-    handleSubmitExpense();
-    setCurrentState(stateOrder[currentIndex + 1]);
+    //prefill next question with stored value
     setInputExpense(handleGetStoredValue(stateOrder[currentIndex + 1]));
+    console.log(`currentCategory: ${inputCategory}, currentExpense: ${inputExpense}`);
+    setCurrentState(stateOrder[currentIndex + 1]);
   }
+  };
+
+  interface Expense {
+  id: string;
+  amount: number | "";
+  category: string;
+}
+
+  const handleSubmitExpense = () => {
+      const newEntry: Expense = {
+    id: crypto.randomUUID(), 
+    amount: Number(inputExpense),
+    category: inputCategory,
+  };
+
+  // Add the new object to your array
+  setExpenseList((prev) => [...prev, newEntry]);
+      setInputCategory("");
+      setInputExpense(0);
+    }
+
+    //removes previous expense when going back
+  const handleRemoveExpense = (id: string) => {
+    setExpenseList((prev) => prev.filter((item) => item.id !== id));
+    console.log(`Removed expense with id: ${id}`);
+  }
+
+  const handleClearAllStorage = () => {
+    localStorage.clear();
+    setCount(0);
+    setInputExpense(0);
+    setInputCategory("");
+    setExpenseList([]);
+  
   };
 
   const handlePrev = () => {
@@ -75,35 +120,6 @@ function App() {
       }
       setCurrentState(stateOrder[currentIndex - 1]);
     }
-  };
-
-  interface Expense {
-  id: string;
-  amount: number | "";
-  category: string;
-}
-
-  const handleSubmitExpense = () => {
-      const newEntry: Expense = {
-    id: crypto.randomUUID(), 
-    amount: Number(inputExpense),
-    category: inputCategory,
-  };
-
-
-  // Add the new object to your array
-  setExpenseList((prev) => [...prev, newEntry]);
-      setInputCategory("");
-      setInputExpense(0);
-    }
-
-  const handleClearAllStorage = () => {
-    localStorage.clear();
-    setCount(0);
-    setInputExpense(0);
-    setInputCategory("");
-    setExpenseList([]);
-  
   };
 
   // Helper function to group your expenseList by category
@@ -305,14 +321,20 @@ const chartData = expenseList.reduce((acc, current) => {
         
           <button 
           id='prev-button'
-          onClick={handlePrev} 
+          onClick={() => {
+            //todo remove expense associated with previous question when going back
+            console.log(`Current State: ${currentState}`);
+            console.log(`Removing expense for previous category: ${handleGetStoredCategory(currentState[currentIndex - 1])}`);
+            handleRemoveExpense(handleGetStoredCategory(currentState[currentIndex - 1]));
+            handlePrev();
+          }} 
           disabled={currentState === 'home'} 
           hidden={currentState === 'home'}>
             Back
           </button>
           <button 
           id='next-button'
-          onClick={handleNext} 
+          onClick={handleNext}
           disabled={currentState === 'summary'} 
           hidden={currentState === 'summary'}>
             Next
