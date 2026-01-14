@@ -14,12 +14,10 @@
 
   export const handleGetStoredValue = (key: string): number => {
     const storedValue = localStorage.getItem(key);
-    //if(!storedValue) return 0;
     return storedValue ? Number(storedValue) : 0;
   }
 
   export const handleRemoveStoredValue = (key: string) => {
-
     localStorage.removeItem(key);
   }
 

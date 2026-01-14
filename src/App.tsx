@@ -1,25 +1,25 @@
 import { useState, useEffect } from 'react'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css'
-import {handleSetStoredValue, handleGetStoredValue, handleSetStoredCategory, handleGetStoredCategory}  from './storageHandles';
+import {handleSetStoredValue, handleGetStoredValue, handleGetStoredCategory}  from './storageHandles';
 
 function App() {
   //order our questions for navigation and for managing state
   const stateOrder = ['home', 'q1', 'q2', 'q3', 'q4', 'q5', 'summary'];
   type PageState = typeof stateOrder[number];
 
+  //state variables
   const [currentState, setCurrentState] = useState<PageState>('q1');
   const [inputExpense, setInputExpense] = useState<number>(0);
   const [inputCategory, setInputCategory] = useState<string>("");
   const currentIndex = stateOrder.indexOf(currentState);
   const [expenseList, setExpenseList] = useState<Expense[]>([]);
 
+  //colors for pie chart
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 //initialize input value from storage when component mounts
   useEffect(() => {
-    //setInputExpense(handleGetStoredValue(stateOrder[currentIndex + 1]));
-        //setInputExpense(handleGetExpenseValue('income'));
     const storedValue = handleGetStoredValue(stateOrder[currentIndex]);
     setInputExpense(storedValue);
     console.log(`Initialized inputExpense with stored value: ${storedValue}`);
@@ -27,16 +27,9 @@ function App() {
 
   const handleNext = () =>{
    if(currentIndex < stateOrder.length - 1) {
-    //store input value when moving to next question
+    //store current input value before navigating income first, then expenses as an object in array
     if(currentState === 'q1'){
       handleSetStoredValue('q1', inputExpense);
-      //prefill expenselist with income entry
-      //if(expenseList.length === 0){
-       // setExpenseList((prev) => [...prev, {id: 'income', amount: inputExpense, category: 'Income'}]);
-      //}
-      //else{
-       // setExpenseList((prev) => prev.map(item => item.id === 'income' ? {...item, amount: inputExpense} : item));
-      //}
     }
     else if(currentState === 'q2'){
       handleSetStoredValue('q2', inputExpense);
@@ -103,8 +96,7 @@ function App() {
     if(currentIndex > 0){
       //if going back to income question, prefill with stored value
       if(currentState === 'q2'){
-        handleSetStoredValue('q1', inputExpense);
-        handleRemoveExpense('income');
+        setInputExpense(handleGetStoredValue('q1'));
       }
       else if(currentState === 'q3'){
         setInputExpense(handleGetExpenseValue('rent'));
@@ -252,25 +244,7 @@ const chartData = expenseList.reduce((acc, current) => {
 
       )}
 
-      {currentState === 'q5' && (
-<div style = {{flex:1, marginLeft: '50px', marginRight: '-50px'}}>
-        <h3>Current Expenses:</h3>
-        <div className="display-list">
-        {expenseList.map((item) => (
-        <div key={item.id} className="expense-item">
-          <strong>{item.category}:</strong> ${item.amount}
-          <button onClick={() => {
-            setExpenseList((prev) => prev.filter((i) => i.id !== item.id));
-          }}
-          >Remove</button>
-        </div>
-      ))}
-      <button onClick={() => handleClearAllStorage()}>Clear All Expenses</button>
-      </div>
-        </div>
-      )}
-       
-        <div style={{ flex: 1 , width: '500px', marginLeft: '-50px' }} id="chart-container">
+       <div style={{ flex: 1 , width: '850px' }} id="chart-container">
     
       {currentState === 'q5' && (
 
@@ -296,6 +270,26 @@ const chartData = expenseList.reduce((acc, current) => {
     </ResponsiveContainer>
       )}
   </div>
+
+      {currentState === 'q5' && (
+<div style = {{flex:1, marginLeft: '50px', marginRight: '-50px'}}>
+        <h3>Current Expenses:</h3>
+        <div className="display-list">
+        {expenseList.map((item) => (
+        <div key={item.id} className="expense-item">
+          <strong>{item.category}:</strong> ${item.amount}
+          <button onClick={() => {
+            handleRemoveExpense(item.id);
+          }}
+          >Remove</button>
+        </div>
+      ))}
+      <button onClick={() => handleClearAllStorage()}>Clear All Expenses</button>
+      </div>
+        </div>
+      )}
+       
+       
       </div>
       </div>
       
